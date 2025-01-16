@@ -1,12 +1,4 @@
-# zc_enum
-在很多时候，我们想在C++中使用枚举，而且想给每个枚举添加描述信息，这很难做到，只能通过类封装实现。
-
-本人通过宏实现了一套通用的枚举类模板，可以很方便的进行使用.
-
-**错误码**
-
-```cpp
-#pragma once
+﻿#pragma once
 #include "zc/EnumUtils.hpp"
 
 ENUM_BEGIN(ErrorCodes, int, code)
@@ -34,23 +26,3 @@ ENUM_BEGIN(ErrorCodes, int, code)
 	ENUM_V(ErrorCodes, JsonParserError, 30001, "json 解析失败");
 	ENUM_V(ErrorCodes, ErrNetwork, 30002, "网络错误"); 		//网络错误
 ENUM_END(ErrorCodes)
-```
-
-**路由类型**
-
-```cpp
-#pragma once
-
-#include "zc/EnumUtils.hpp"
-
-ENUM_BEGIN(RouteType, const char*, route)
-
-	ENUM_V(RouteType, SysUserEdit, "system/user/edit", "编辑用户");
-	ENUM_V(RouteType, SysUserAdd, "system/user/add", "添加用户");
-	ENUM_V(RouteType, SysVipEdit, "system/vip/edit", "编辑VIP");
-	ENUM_V(RouteType, SysVipAdd, "system/vip/add", "添加VIP");
-	
-ENUM_END(RouteType)
-```
-
-更多请看test目录中的测试文件！！
