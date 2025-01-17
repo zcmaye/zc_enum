@@ -4,6 +4,7 @@
 #include "RouteType.hpp"
 #include "HttpStatus.h"
 #include "Menus.hpp"
+#include "Alignment.hpp"
 
 /*void test_ErrorCodes() {
 	std::cout << "====================ErrorCodes==========================" << std::endl;
@@ -137,7 +138,78 @@ void test_other()
 		std::cout << rt.name << " : " << rt.route<< " " << rt.description << std::endl;
 	}
 
-	RouteType::from_index(-1);
+}
+
+void test_EnumFlags()
+{
+	std::cout << "======================Alignment======================" << std::endl;
+	for (auto& e : Alignment::enums()) {
+		std::cout.width(20);
+		std::cout << e->name << " : " << e->value << " " << e->description << std::endl;
+	}
+
+	std::cout << "======================EnumFlags======================" << std::endl;
+	auto flags = Alignment::AlignTop | Alignment::AlignRight | Alignment::AlignCenter;
+	std::cout << " flags int " << flags.toValue() << std::endl;	//114
+#define XXX(x)\
+	if (flags.testFlag(x)) {\
+		std::cout << "has " << #x << std::endl;\
+	}\
+	else {\
+		std::cout << "no " << #x << std::endl;\
+	}
+
+	XXX(Alignment::AlignTop);
+	XXX(Alignment::AlignBottom);
+	XXX(Alignment::AlignLeft);
+	XXX(Alignment::AlignRight);
+	XXX(Alignment::AlignHCenter);
+	XXX(Alignment::AlignVCenter);
+	XXX(Alignment::AlignCenter);
+
+#undef XXX
+
+	//取消flag
+	flags.setFlag(Alignment::AlignCenter, false);
+	std::cout << " flags int " << flags.toValue() << std::endl; //18
+
+	//异或没有就加，有就取消
+	flags ^= Alignment::AlignLeft;
+	std::cout << " flags int " << flags.toValue() << std::endl; //26
+
+	flags ^= Alignment::AlignLeft;
+	std::cout << " flags int " << flags.toValue() << std::endl; //18
+
+
+	auto new_flags =  Alignment::AlignTop  | Alignment::AlignHCenter | Alignment::AlignVCenter;
+	//测试flags中有没有new_flags中的任意一个
+	if (flags.testAnyFlags(new_flags)) {
+		std::cout << "has any flags" << std::endl;	//ok
+	}
+	else {
+		std::cout << "no any flags" << std::endl;
+	}
+
+
+	//把两个flags合并在一起
+	flags |= new_flags;
+	std::cout << " flags int " << flags.toValue() << std::endl; //114
+
+	//判断是否已经设置标志
+	if (!flags) {
+		std::cout << "flag is not set" << std::endl;
+	}
+	else {
+		std::cout << "flag is set" << std::endl;
+	}
+
+	EnumFlags<Alignment> flags_;
+	if (!flags_) {
+		std::cout << "flag is not set" << std::endl;
+	}
+	else {
+		std::cout << "flag is set" << std::endl;
+	}
 }
 
 int main(int argc, char* argv[])
@@ -149,6 +221,9 @@ int main(int argc, char* argv[])
 		test_HttpStatus();
 		test_Menu();
 		test_other();
+		test_EnumFlags();
+
+		RouteType::from_index(-1);
 	}
 	catch (const std::exception& e)
 	{
