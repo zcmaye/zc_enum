@@ -93,17 +93,17 @@ public:
 		static const Self& from_index(int index) { return static_cast<const Self&>(Super::from_index(index)); }\
 		static const Self& from_name(const char* enum_name) { return static_cast<const Self&>(Super::from_name(enum_name)); }
 
- /**
-  * 枚举类结束定义宏.
-  */
+/**
+ * 枚举类结束定义宏.
+ */
 #define ENUM_END(ClassName) };
 
-  /**
-   * 枚举值定义宏,需要C++17标准，如果不支持C++17，请使用ENUM_V_DECL和ENUM_V_IMPL. example:ENUM_V(Code_200, 200, "Ok");
-   * @param enum_n 枚举名
-   * @param enum_v 枚举值
-   * @param enum_dscr 枚举描述
-   */
+/**
+ * 枚举值定义宏,需要C++17标准，如果不支持C++17，请使用ENUM_V_DECL和ENUM_V_IMPL. example:ENUM_V(Code_200, 200, "Ok");
+ * @param enum_n 枚举名
+ * @param enum_v 枚举值
+ * @param enum_dscr 枚举描述
+ */
 #define ENUM_V(enum_n,enum_v,enum_descr)\
 	private:\
 	static const Self&  Get_##enum_n(){\
@@ -115,18 +115,18 @@ public:
 			return Get_##enum_n();\
 		}();
 
-   /**
-	* 枚举值声明宏,搭配ENUM_V_IMPL来使用,详情请看测试代码.example:ENUM_V_DECL(Code_200);
-	* @param enum_n 枚举名
-	*/
+/**
+ * 枚举值声明宏,搭配ENUM_V_IMPL来使用,详情请看测试代码.example:ENUM_V_DECL(Code_200);
+ * @param enum_n 枚举名
+ */
 #define ENUM_V_DECL(enum_n)\
 	static const Self& enum_n
 
-	/**
-	 * 枚举值定义宏, example:ENUM_V_IMPL(Status,Code_200, 200, "Ok");
-	 * @param enum_n 枚举名
-	 * @param enum_v 枚举值
-	 * @param enum_dscr 枚举描述
-	 */
+/**
+ * 枚举值定义宏, example:ENUM_V_IMPL(Status,Code_200, 200, "Ok");
+ * @param enum_n 枚举名
+ * @param enum_v 枚举值
+ * @param enum_dscr 枚举描述
+ */
 #define ENUM_V_IMPL(ClassName,enum_n,enum_v,enum_descr)\
 	const ClassName&  ClassName::enum_n{enum_v,enum_descr,#enum_n}
