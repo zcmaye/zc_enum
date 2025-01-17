@@ -13,4 +13,4 @@ ENUM_BEGIN_DEFAULT(Alignment)
 	ENUM_V(AlignHCenter,1<<5,"");
 	ENUM_V(AlignVCenter,1<<6,"");
 	ENUM_V(AlignCenter, AlignHCenter | AlignVCenter, "");
-ENUM_END(ErrorCodes)
+ENUM_END(Alignment)

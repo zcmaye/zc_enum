@@ -265,7 +265,9 @@ EnumFlags<enum_t> operator|(const enum_t& left, const enum_t& right) {
  /**
   * 枚举类结束定义宏.
   */
-#define ENUM_END(ClassName) };
+#define ENUM_END(ClassName)\
+};\
+using ClassName##s = EnumFlags<ClassName>;
 
   /**
    * 枚举值定义宏,需要C++17标准，如果不支持C++17，请使用ENUM_V_DECL和ENUM_V_IMPL. example:ENUM_V(Code_200, 200, "Ok");

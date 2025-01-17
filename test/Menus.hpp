@@ -9,4 +9,4 @@ ENUM_BEGIN_DEFAULT(Menu)
 	ENUM_V(Search, 3, "查找学生");
 	ENUM_V(Quit, 4, "退出系统");
 
-ENUM_END(Options)
+ENUM_END(Menu)
