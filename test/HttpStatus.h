@@ -2,10 +2,8 @@
 
 #include "zc/EnumUtils.hpp"
 
-ENUM_INNER_CLASS(HttpStatus, int, code)
-
-namespace Status {
-	ENUM_V_DECL(HttpStatus, CODE_200);
-	ENUM_V_DECL(HttpStatus, CODE_404);
-	ENUM_V_DECL(HttpStatus, CODE_500);
-}
+ENUM_BEGIN(HttpStatus, int, code)
+	ENUM_V_DECL(CODE_200);
+	ENUM_V_DECL(CODE_404);
+	ENUM_V_DECL(CODE_500);
+ENUM_END(HttpStatus)
