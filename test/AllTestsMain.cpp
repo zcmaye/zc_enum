@@ -204,7 +204,7 @@ void test_EnumFlags()
 	}
 
 	//EnumFlags<Alignment> flags_;
-	Alignments flags_;
+	AlignmentFlags flags_;
 	if (!flags_) {
 		std::cout << "flag is not set" << std::endl;
 	}

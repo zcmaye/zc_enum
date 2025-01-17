@@ -4,235 +4,237 @@
 #include <string>
 #include <initializer_list>
 #include <map>
+namespace zc {
 
-/**
- * 枚举异常类.
- */
-class EnumNotFound : public std::exception {
-public:
-	EnumNotFound()
-		:std::exception("Enum Not Found") {}
-};
+	/**
+	 * 枚举异常类.
+	 */
+	class EnumNotFound : public std::exception {
+	public:
+		EnumNotFound()
+			:std::exception("Enum Not Found") {}
+	};
 
-template<typename enum_t>
-class EnumFlags
-{
-private:
-	std::map<typename enum_t::value_t, const enum_t&> m_flags;
-public:
-	EnumFlags() = default;
-	EnumFlags(const enum_t& flags) {
-		setFlag(flags);
-	}
-	EnumFlags(std::initializer_list<enum_t> flags) {
-		for (auto flag : flags) {
-			setFlag(flag);
-		}
-	}
-
-	void setFlag(const enum_t& flag, bool on = true) {
-		if (on) {
-			m_flags.insert({ flag.value, flag });
-		}
-		else {
-			m_flags.erase(flag.value);
-		}
-	}
-
-	operator typename enum_t::value_t()const { return toValue(); }
-	typename enum_t::value_t toValue()const
+	template<typename enum_t>
+	class EnumFlags
 	{
-		if (m_flags.empty())
-			return typename enum_t::value_t{};
-		typename enum_t::value_t value = m_flags.begin()->first;
-		for (auto& p : m_flags) {
-			value |= p.first;
+	private:
+		std::map<typename enum_t::value_t, const enum_t&> m_flags;
+	public:
+		EnumFlags() = default;
+		EnumFlags(const enum_t& flags) {
+			setFlag(flags);
 		}
-		return value;
-	}
-
-	bool testFlag(const enum_t& flag) {
-		for (auto& p : m_flags) {
-			if (p.first == flag.value) {
-				return true;
+		EnumFlags(std::initializer_list<enum_t> flags) {
+			for (auto flag : flags) {
+				setFlag(flag);
 			}
 		}
-		return false;
-	}
 
-	bool testFlags(const EnumFlags& flags) {
-		if (m_flags.empty() || flags.m_flags.empty())
-			return false;
-		if (m_flags.size() != flags.m_flags.size())
-			return false;
-		for (auto it1 = m_flags.begin(), it2 = flags.m_flags.begin();
-			it1 != m_flags.end() && it2 != flags.m_flags.end();
-			++it1, ++it2) {
-			if (it1->first != it2->first) {
-				return false;
+		void setFlag(const enum_t& flag, bool on = true) {
+			if (on) {
+				m_flags.insert({ flag.value, flag });
+			}
+			else {
+				m_flags.erase(flag.value);
 			}
 		}
-		return true;
-	}
 
-	bool testAnyFlags(const EnumFlags& flags) {
-		if (m_flags.empty() || flags.m_flags.empty())
-			return false;
-		for (auto it1 = m_flags.begin(); it1 != m_flags.end();++it1) {
-			for (auto it2 = flags.m_flags.begin(); it2 != flags.m_flags.end();++it2) {
-				if (it1->first == it2->first) {
+		operator typename enum_t::value_t()const { return toValue(); }
+		typename enum_t::value_t toValue()const
+		{
+			if (m_flags.empty())
+				return typename enum_t::value_t{};
+			typename enum_t::value_t value = m_flags.begin()->first;
+			for (auto& p : m_flags) {
+				value |= p.first;
+			}
+			return value;
+		}
+
+		bool testFlag(const enum_t& flag) {
+			for (auto& p : m_flags) {
+				if (p.first == flag.value) {
 					return true;
 				}
 			}
+			return false;
 		}
-		return false;
-	}
 
-	bool operator!()const
-	{
-		return m_flags.empty();
-	}
-
-	EnumFlags& operator&=(const enum_t& e) {
-		if (!testFlag(e)) {
-			setFlag(e);
+		bool testFlags(const EnumFlags& flags) {
+			if (m_flags.empty() || flags.m_flags.empty())
+				return false;
+			if (m_flags.size() != flags.m_flags.size())
+				return false;
+			for (auto it1 = m_flags.begin(), it2 = flags.m_flags.begin();
+				it1 != m_flags.end() && it2 != flags.m_flags.end();
+				++it1, ++it2) {
+				if (it1->first != it2->first) {
+					return false;
+				}
+			}
+			return true;
 		}
-		return *this;
-	}
 
-	EnumFlags& operator&=(const EnumFlags& flags) {
-		for (auto& p : flags.m_flags) {
-			*this &= p.second;
+		bool testAnyFlags(const EnumFlags& flags) {
+			if (m_flags.empty() || flags.m_flags.empty())
+				return false;
+			for (auto it1 = m_flags.begin(); it1 != m_flags.end();++it1) {
+				for (auto it2 = flags.m_flags.begin(); it2 != flags.m_flags.end();++it2) {
+					if (it1->first == it2->first) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
-		return *this;
-	}
 
-	EnumFlags operator&(const enum_t& e)const {
-		EnumFlags flags = *this;
-		flags &= e;
-		return flags;
-	}
-
-	EnumFlags operator&(const EnumFlags& flags)const {
-		EnumFlags new_flags = *this;
-		new_flags &= flags;
-		return new_flags;
-	}
-
-	EnumFlags& operator|=(const enum_t& e) {
-		if (!testFlag(e))
-			setFlag(e);
-		return *this;
-	}
-
-	EnumFlags& operator|=(const EnumFlags& flags) {
-		for (auto& p : flags.m_flags)
-			*this &= p.second;
-		return *this;
-	}
-
-	EnumFlags operator|(const enum_t& e)const {
-		EnumFlags new_flags = *this;
-		new_flags |= e;
-		return new_flags;
-	}
-
-	EnumFlags operator|(const EnumFlags& flags)const {
-		EnumFlags new_flags = *this;
-		new_flags |= flags;
-		return new_flags;
-	}
-
-	EnumFlags& operator^=(const enum_t& e) {
-		setFlag(e, !testFlag(e));
-		return *this;
-	}
-
-	EnumFlags& operator^=(const EnumFlags& flags) {
-		for (auto& p : flags.m_flags) {
-			*this |= p.second;
+		bool operator!()const
+		{
+			return m_flags.empty();
 		}
-		return *this;
-	}
 
-	EnumFlags operator^(const enum_t& e)const {
-		EnumFlags new_flags = *this;
-		new_flags ^= e;
-		return new_flags;
-	}
-
-	EnumFlags operator^(const EnumFlags& flags)const {
-		EnumFlags new_flags = *this;
-		new_flags ^= flags;
-		return new_flags;
-	}
-};
-
-
-
-/**
- * 枚举基类.
- */
-template<typename T, typename ValueType>
-class EnumBase {
-public:
-	using value_t = ValueType;
-private:
-	inline static std::vector<const EnumBase*> s_enums;
-public:
-	std::string name;			//枚举名
-	value_t value;				//枚举值
-	const char* description;	//枚举描述
-
-	EnumBase(const value_t& value, const char* description, const char* vname)
-		:value(value), description(description), name(vname) {
-		s_enums.push_back(this);
-	}
-
-	static const auto& enums() {
-		return s_enums;
-	}
-	static const EnumBase& from_value(const value_t& value) {
-		for (auto e : s_enums) {
-			if (e->value == value) return *e;
+		EnumFlags& operator&=(const enum_t& e) {
+			if (!testFlag(e)) {
+				setFlag(e);
+			}
+			return *this;
 		}
-		throw EnumNotFound();
-	}
-	static const EnumBase& from_index(int index) {
-		try {
-			return *s_enums.at(index);
+
+		EnumFlags& operator&=(const EnumFlags& flags) {
+			for (auto& p : flags.m_flags) {
+				*this &= p.second;
+			}
+			return *this;
 		}
-		catch (...) {
+
+		EnumFlags operator&(const enum_t& e)const {
+			EnumFlags flags = *this;
+			flags &= e;
+			return flags;
+		}
+
+		EnumFlags operator&(const EnumFlags& flags)const {
+			EnumFlags new_flags = *this;
+			new_flags &= flags;
+			return new_flags;
+		}
+
+		EnumFlags& operator|=(const enum_t& e) {
+			if (!testFlag(e))
+				setFlag(e);
+			return *this;
+		}
+
+		EnumFlags& operator|=(const EnumFlags& flags) {
+			for (auto& p : flags.m_flags)
+				*this &= p.second;
+			return *this;
+		}
+
+		EnumFlags operator|(const enum_t& e)const {
+			EnumFlags new_flags = *this;
+			new_flags |= e;
+			return new_flags;
+		}
+
+		EnumFlags operator|(const EnumFlags& flags)const {
+			EnumFlags new_flags = *this;
+			new_flags |= flags;
+			return new_flags;
+		}
+
+		EnumFlags& operator^=(const enum_t& e) {
+			setFlag(e, !testFlag(e));
+			return *this;
+		}
+
+		EnumFlags& operator^=(const EnumFlags& flags) {
+			for (auto& p : flags.m_flags) {
+				*this |= p.second;
+			}
+			return *this;
+		}
+
+		EnumFlags operator^(const enum_t& e)const {
+			EnumFlags new_flags = *this;
+			new_flags ^= e;
+			return new_flags;
+		}
+
+		EnumFlags operator^(const EnumFlags& flags)const {
+			EnumFlags new_flags = *this;
+			new_flags ^= flags;
+			return new_flags;
+		}
+	};
+
+
+
+	/**
+	 * 枚举基类.
+	 */
+	template<typename T, typename ValueType>
+	class EnumBase {
+	public:
+		using value_t = ValueType;
+	private:
+		inline static std::vector<const EnumBase*> s_enums;
+	public:
+		std::string name;			//枚举名
+		value_t value;				//枚举值
+		const char* description;	//枚举描述
+
+		EnumBase(const value_t& value, const char* description, const char* vname)
+			:value(value), description(description), name(vname) {
+			s_enums.push_back(this);
+		}
+
+		static const auto& enums() {
+			return s_enums;
+		}
+		static const EnumBase& from_value(const value_t& value) {
+			for (auto e : s_enums) {
+				if (e->value == value) return *e;
+			}
 			throw EnumNotFound();
 		}
-	}
-	static const EnumBase& from_name(const char* enum_name) {
-		for (auto e : s_enums) {
-			if (e->name == enum_name)
-				return *e;
+		static const EnumBase& from_index(int index) {
+			try {
+				return *s_enums.at(index);
+			}
+			catch (...) {
+				throw EnumNotFound();
+			}
 		}
-		throw EnumNotFound();
-	}
-	operator const value_t& ()const {
-		return value;
-	}
-	friend bool operator==(const EnumBase& left, const EnumBase& right) {
-		return left.value == right.value;
-	}
-	friend bool operator!=(const EnumBase& left, const EnumBase& right) {
-		return left.value != right.value;
-	}
+		static const EnumBase& from_name(const char* enum_name) {
+			for (auto e : s_enums) {
+				if (e->name == enum_name)
+					return *e;
+			}
+			throw EnumNotFound();
+		}
+		operator const value_t& ()const {
+			return value;
+		}
+		friend bool operator==(const EnumBase& left, const EnumBase& right) {
+			return left.value == right.value;
+		}
+		friend bool operator!=(const EnumBase& left, const EnumBase& right) {
+			return left.value != right.value;
+		}
 
+		template<typename enum_t>
+		friend EnumFlags<enum_t> operator|(const enum_t& left, const enum_t& right);
+
+	};
 	template<typename enum_t>
-	friend EnumFlags<enum_t> operator|(const enum_t& left, const enum_t& right);
-
-};
-template<typename enum_t>
-EnumFlags<enum_t> operator|(const enum_t& left, const enum_t& right) {
-	EnumFlags<enum_t> flags;
-	flags.setFlag(left);
-	flags.setFlag(right);
-	return  flags;
+	EnumFlags<enum_t> operator|(const enum_t& left, const enum_t& right) {
+		EnumFlags<enum_t> flags;
+		flags.setFlag(left);
+		flags.setFlag(right);
+		return  flags;
+	}
 }
 
 /**
@@ -244,7 +246,7 @@ EnumFlags<enum_t> operator|(const enum_t& left, const enum_t& right) {
 #define ENUM_BEGIN_DEFAULT(ClassName) ENUM_BEGIN(ClassName,int,value_self)
 
 #define ENUM_BEGIN(ClassName,value_type,value_name)\
-	class ClassName : public EnumBase<ClassName,value_type>{\
+	class ClassName : public zc::EnumBase<ClassName,value_type>{\
 		using Self = ClassName;\
 		using Super = EnumBase<ClassName, value_type>;\
 		friend class EnumBase<ClassName, value_type>;\
@@ -267,7 +269,7 @@ EnumFlags<enum_t> operator|(const enum_t& left, const enum_t& right) {
   */
 #define ENUM_END(ClassName)\
 };\
-using ClassName##s = EnumFlags<ClassName>;
+using ClassName##Flags = zc::EnumFlags<ClassName>;
 
   /**
    * 枚举值定义宏,需要C++17标准，如果不支持C++17，请使用ENUM_V_DECL和ENUM_V_IMPL. example:ENUM_V(Code_200, 200, "Ok");
